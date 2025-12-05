@@ -1,0 +1,63 @@
+from flask import Flask, render_template_string, request
+from scraper_tool import fetch_recipes_from_internet
+from recipe_analyzer import analyze_recipes, WARNING_THRESHOLD, MAX_ACCEPTABLE_RISK
+
+app = Flask(__name__)
+
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Akrilamid Risk Analizi</title>
+</head>
+<body>
+    <h1>Akrilamid Analizi</h1>
+    <form method="POST" action="/">
+        <input type="text" name="dish_name" placeholder="Yemek Adı" required>
+        <button type="submit">Analiz Et</button>
+    </form>
+
+    {% if analysis_results %}
+        <h2>Sonuçlar:</h2>
+        {% for recipe in analysis_results %}
+            <h3>{{ recipe.name }} (Risk: {{ recipe.score }})</h3>
+            <ul>
+                {% for step in recipe.steps %}
+                    <li>{{ step }}</li>
+                {% endfor %}
+            </ul>
+
+            {% if recipe.is_high_risk %}
+                <strong>Alternatifler:</strong>
+                <ul>
+                    {% for alt in recipe.alternatives %}
+                        <li>{{ alt }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</body>
+</html>
+"""
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        dish_name = request.form['dish_name']
+        recipes = fetch_recipes_from_internet(dish_name)
+        analysis_results, low_risk_results = analyze_recipes(recipes)
+
+        return render_template_string(
+            HTML_TEMPLATE,
+            analysis_results=analysis_results,
+            dish_name=dish_name,
+            WARNING_THRESHOLD=WARNING_THRESHOLD,
+            MAX_ACCEPTABLE_RISK=MAX_ACCEPTABLE_RISK
+        )
+
+    return render_template_string(HTML_TEMPLATE)
+
+if __name__ == "__main__":
+    print("Çalışıyor → http://127.0.0.1:5000")
+    app.run(debug=True)

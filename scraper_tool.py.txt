@@ -1,0 +1,64 @@
+import random
+
+def fetch_recipes_from_internet(dish_name):
+    dish_name = dish_name.lower()
+
+    simulated_recipes = []
+
+    if "patates" in dish_name:
+        simulated_recipes = [
+            {
+                "name": "Klasik Çıtır Patates Kızartması",
+                "ingredients": ["Patates", "Ayçiçek yağı"],
+                "steps": [
+                    "Patatesleri kes ve iyice kurut.",
+                    "Yağı *180°C'de* ısıt.",
+                    "Patatesleri *derin yağda kızart* (170°C-180°C) *koyu kahverengi* olana kadar 10 dakika kızart."
+                ]
+            },
+            {
+                "name": "Fırında Düşük Riskli Patates",
+                "ingredients": ["Patates", "Zeytinyağı", "Biberiye"],
+                "steps": [
+                    "Patatesleri sirkeli suda 30 dakika beklet.",
+                    "Patatesleri ılık suyla durula.",
+                    "Zeytinyağı ile karıştır ve *160°C'de fırında pişir* 30 dakika."
+                ]
+            },
+            {
+                "name": "Buharda Pişmiş Patates Püresi",
+                "ingredients": ["Patates", "Süt", "Tereyağı"],
+                "steps": [
+                    "Patatesleri buhar sepetinde 20 dakika pişir.",
+                    "Süt ve tereyağı ekleyerek ez."
+                ]
+            }
+        ]
+
+    elif "bisküvi" in dish_name:
+        simulated_recipes = [
+            {
+                "name": "Amonyaklı Bebek Bisküvisi",
+                "ingredients": ["Un", "Şeker", "Amonyum bikarbonat"],
+                "steps": [
+                    "Hamuru hazırla.",
+                    "180°C'de 15 dakika koyu renk alana kadar pişir."
+                ]
+            },
+        ]
+
+    else:
+        simulated_recipes = [
+            {
+                "name": "Riskli Örnek Yemek",
+                "ingredients": ["Gıda 1", "Gıda 2"],
+                "steps": ["Yemeği 175°C'de derin yağda kızart 8 dakika."]
+            },
+            {
+                "name": "Risksiz Örnek Yemek",
+                "ingredients": ["Gıda 1", "Gıda 2"],
+                "steps": ["Yemeği buharda 10 dakika pişir."]
+            }
+        ]
+
+    return simulated_recipes

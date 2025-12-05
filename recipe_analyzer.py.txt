@@ -1,0 +1,75 @@
+RISK_FACTORS = {
+    "temperature": {
+        "160-180": 10,
+        "180-200": 8,
+        "200+": 6,
+        "120-160": 4,
+        "120-": 0
+    },
+    "method": {
+        "derin yağda kızart": 12,
+        "yüksek ısıda fırın": 8,
+        "koyu renk": 8,
+        "amonyum bikarbonat": 10,
+        "vakum kızart": -5,
+        "buharda": -8,
+        "kaynat": -4,
+    },
+    "mitigation": {
+        "sirkeli suda beklet": -6,
+        "asparaginaz": -8
+    }
+}
+
+WARNING_THRESHOLD = 15
+MAX_ACCEPTABLE_RISK = 5 
+
+def calculate_risk_score(recipe):
+    score = 0
+    text = " ".join(recipe['steps']).lower()
+
+    for temp_range, risk in RISK_FACTORS['temperature'].items():
+        if temp_range == "160-180" and any(t in text for t in ["160°c","170°c","180°c"]):
+            score += risk
+        elif temp_range == "200+" and any(t in text for t in ["200°c","220°c","240°c"]):
+            score += risk
+
+    for method, risk in RISK_FACTORS['method'].items():
+        if method in text:
+            score += risk
+
+    for method, reduction in RISK_FACTORS['mitigation'].items():
+        if method in text:
+            score += reduction
+
+    return max(0, score)
+
+def get_low_acrylamide_alternatives(recipe):
+    alternative_steps = []
+
+    if "patates" in recipe['ingredients'][0].lower():
+        alternative_steps.append("Patatesleri suda bekletin.")
+        alternative_steps.append("160°C altı sıcaklık kullanın.")
+        alternative_steps.append("Derin yağ yerine buharlama kullanın.")
+        alternative_steps.append("Açık altın sarısı renge kadar pişirin.")
+
+    return alternative_steps
+
+def analyze_recipes(recipes):
+    results = []
+
+    for recipe in recipes:
+        score = calculate_risk_score(recipe)
+        is_high = score > WARNING_THRESHOLD
+        alternatives = get_low_acrylamide_alternatives(recipe) if is_high else []
+
+        results.append({
+            "name": recipe['name'],
+            "score": score,
+            "steps": recipe['steps'],
+            "is_high_risk": is_high,
+            "alternatives": alternatives
+        })
+
+    low_risk = sorted(results, key=lambda x: x['score'])
+    return results, low_risk
